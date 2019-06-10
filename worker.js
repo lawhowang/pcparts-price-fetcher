@@ -19,7 +19,7 @@ function getCodeByCatName(name) {
             return key;
         }
     }
-    return "unknown";
+    return "others";
 }
 
 let global = {
@@ -38,7 +38,7 @@ function addProduct(company, code, name, price) {
     });
 }
 
-async.parallel([
+async.series([
     function (finish) {
         // TerminalHK All
         request('http://www.terminalhk.com/api/public/product', function (error, response, body) {

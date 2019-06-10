@@ -28,7 +28,7 @@ function refresh() {
     })
 }
 
-setInterval(refresh, 1000); // 5 mins
+setInterval(refresh, 30000); // 5 mins
 
 app.use(express.static('public'));
 app.listen(process.env.PORT || 80)

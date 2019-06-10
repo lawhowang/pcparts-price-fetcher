@@ -19,7 +19,30 @@
                 el: '#app',
                 data: {
                     message: 'Hello Vue!',
-                    result: null
+                    result: null,
+                    searchQuery: '',
+                    filter: '',
+                    loading: true
+                },
+                methods: {
+                    search: function (e) {
+                        e.preventDefault();
+                        /*if (!this.searchQuery) {
+                            return false;
+                        }*/
+                        this.loading = true;
+                        setTimeout(() => {
+                            this.filter = this.searchQuery;
+                            this.loading = false;
+                        }, 0);
+                    },
+                    cancelSearch: function() {
+                        this.loading = true;
+                        setTimeout(() => {
+                            this.filter = "";
+                            this.loading = false;
+                        }, 0);
+                    }
                 }
             })
             getLatest();
@@ -29,16 +52,13 @@
             $.getJSON("results.json", function (result) {
                 app.result = result;
                 app.lastUpdate = result.lastUpdate;
+                app.loading = false;
             });
         }
     </script>
 </head>
 
 <body>
-    <h1>價錢</h1>
-
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
         crossorigin="anonymous"></script>
@@ -46,42 +66,88 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
     <div id="app">
-        <div>最後更新 {{lastUpdate}}</div>
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" v-for="(value, name) in result.data">
-                <a class="nav-link" :id="name+'-tab'" data-toggle="tab" :href="'#'+name" role="tab"
-                    :aria-controls="name" aria-selected="true">{{name}}</a>
-            </li>
-        </ul>
-        <div class="tab-content" id="myTabContent">
-            <div v-for="(value, name) in result.data" class="tab-pane fade" :id="name" role="tabpanel"
-                :aria-labelledby="name+'-tab'">
+        <div v-if="lastUpdate" class="text-center">
+            <div class="mt-3">最後更新 {{lastUpdate}}</div>
+            <form @submit="search" class="mt-2">
+                <div class="input-group mb-3 px-2">
+                    <div class="input-group-prepend" v-if="filter.length > 0">
+                        <button class="btn btn-danger" type="button" v-on:click="cancelSearch"><span
+                                aria-hidden="true">&times;</span></button>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Search" aria-label="search"
+                        aria-describedby="basic-addon2" v-model="searchQuery">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="submit">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div v-if="loading" class="d-flex align-content-center flex-wrap justify-content-center"
+            style="position: absolute; top: 100px; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,.75); color: white; text-align: center;">
+            Loading...
+        </div>
+        <div>
+            <ul class="nav nav-tabs" id="myTab" role="tablist" v-if="result">
+                <li class="nav-item" v-for="(value, name) in result.data">
+                    <a class="nav-link" :id="name+'-tab'" data-toggle="tab" :href="'#'+name" role="tab"
+                        :aria-controls="name" aria-selected="true">{{name}}</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent" v-if="result">
+                <div v-for="(value, name) in result.data" class="tab-pane fade" :id="name" role="tabpanel"
+                    :aria-labelledby="name+'-tab'">
 
-                <ul class="nav nav-tabs" id="myTab" role="tablist">
-                    <li class="nav-item" v-for="(products, company) in value">
-                        <a class="nav-link" :id="name+'-'+company+'-tab'" data-toggle="tab" :href="'#'+name+'-'+company" role="tab"
-                            :aria-controls="name+'-'+company" aria-selected="true">{{company}}</a>
-                    </li>
-                </ul>
-                <div class="tab-content" id="myTabContent">
-                    <div v-for="(products, company) in value" class="tab-pane fade" :id="name+'-'+company"
-                        role="tabpanel" :aria-labelledby="name+'-'+company+'-tab'">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">產品名稱</th>
-                                    <th scope="col">價錢</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="product in products">
-                                    <th scope="row">{{product.name}}</th>
-                                    <td>
-                                        {{product.price}}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" v-for="(products, company) in value">
+                            <a class="nav-link" :id="name+'-'+company+'-tab'" data-toggle="tab"
+                                :href="'#'+name+'-'+company" role="tab" :aria-controls="name+'-'+company"
+                                aria-selected="true">{{company}}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" :id="name+'-all-tab'" data-toggle="tab" :href="'#'+name+'-all'"
+                                role="tab" :aria-controls="name+'-all'" aria-selected="true">all</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="myTabContent">
+                        <div v-for="(products, company) in value" class="tab-pane fade" :id="name+'-'+company"
+                            role="tabpanel" :aria-labelledby="name+'-'+company+'-tab'">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">產品名稱</th>
+                                        <th scope="col">價錢</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="product in products" v-if="product.name.indexOf(filter) > -1">
+                                        <th scope="row">{{product.name}}</th>
+                                        <td>
+                                            {{product.price}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" :id="name+'-all'" role="tabpanel" :aria-labelledby="name+'-all-tab'">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">公司</th>
+                                        <th scope="col">產品名稱</th>
+                                        <th scope="col">價錢</th>
+                                    </tr>
+                                </thead>
+                                <tbody v-for="(products, company) in value">
+                                    <tr v-for="product in products" v-if="product.name.indexOf(filter) > -1">
+                                        <th scope="row">{{company}}</th>
+                                        <th scope="row">{{product.name}}</th>
+                                        <td>
+                                            {{product.price}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
