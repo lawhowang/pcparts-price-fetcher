@@ -1,0 +1,19 @@
+{
+  "name": "pcparts-price-fetcher",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --experimental-worker index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tom Law",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^3.0.1",
+    "cheerio": "^1.0.0-rc.3",
+    "express": "^4.17.1",
+    "moment-timezone": "^0.5.25",
+    "request": "^2.88.0"
+  }
+}
