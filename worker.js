@@ -9,6 +9,7 @@ const categories = {
     "cpu": ["CPU", "中央處理器", "處理器", 1],
     "motherboard": ["主機板", 4],
     "memory": ["記憶體", 5],
+    "hidden": ["隱藏"]
 };
 
 function getCodeByCatName(name) {
@@ -47,6 +48,7 @@ async.series([
                 let products = json.products;
                 for (let product of products) {
                     var code = getCodeByCatName(product.category);
+                    if (code == 'hidden') continue;
                     addProduct("terminalhk", code, product.name, product.price);
                 }
             } catch {
