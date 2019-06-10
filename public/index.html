@@ -36,12 +36,20 @@
                             this.loading = false;
                         }, 0);
                     },
-                    cancelSearch: function() {
+                    cancelSearch: function () {
                         this.loading = true;
                         setTimeout(() => {
                             this.filter = "";
                             this.loading = false;
                         }, 0);
+                    },
+                    filtering: function (productName) {
+                        var keywords = this.filter.split(" ");
+                        for (let keyword of keywords) {
+                            if (productName.toLowerCase().indexOf(keyword.toLowerCase()) === -1)
+                                return false;
+                        }
+                        return true;
                     }
                 }
             })
@@ -119,7 +127,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="product in products" v-if="product.name.indexOf(filter) > -1">
+                                    <tr v-for="product in products" v-if="filtering(product.name)">
                                         <th scope="row">{{product.name}}</th>
                                         <td>
                                             {{product.price}}
@@ -138,7 +146,7 @@
                                     </tr>
                                 </thead>
                                 <tbody v-for="(products, company) in value">
-                                    <tr v-for="product in products" v-if="product.name.indexOf(filter) > -1">
+                                    <tr v-for="product in products" v-if="filtering(product.name)">
                                         <th scope="row">{{company}}</th>
                                         <th scope="row">{{product.name}}</th>
                                         <td>
