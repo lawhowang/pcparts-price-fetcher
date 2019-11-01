@@ -41,6 +41,25 @@ function addProduct(company, code, name, price) {
 try {
     async.series([
         function (finish) {
+            // Jumbo computer CPU
+            try {
+                request('http://www.jumbo-computer.com/pricelist.aspx?id=3', function (error, response, body) {
+                    const $ = cheerio.load(body);
+                    $('.gvProducts tr td:first-child').each(function (i, elem) {
+                        let productName = $(this).text();
+                        let price = $(this).next().text().replace('HK$ ', '');
+                        //console.log(productName)
+                        addProduct("jumbo", "cpu", productName, price);
+                    });
+                    finish(null, true);
+                });
+            }
+            catch {
+
+            }
+        },
+
+        function (finish) {
             // TerminalHK All
             request('http://www.terminalhk.com/api/public/product', function (error, response, body) {
                 try {
@@ -75,60 +94,6 @@ try {
             });
         },
 
-        function (finish) {
-            // Jumbo computer CPU
-            try {
-                request('http://www.jumbo-computer.com/pricelist.aspx?id=3', function (error, response, body) {
-                    const $ = cheerio.load(body);
-                    $('.gvProducts tr td:first-child').each(function (i, elem) {
-                        let productName = $(this).text();
-                        let price = $(this).next().text().replace('HK$ ', '');
-                        //console.log(productName)
-                        addProduct("jumbo", "cpu", productName, price);
-                    });
-                    finish(null, true);
-                });
-            }
-            catch {
-
-            }
-        },
-        function (finish) {
-            // Jumbo computer MB
-            try {
-                request('http://www.jumbo-computer.com/pricelist.aspx?id=1', function (error, response, body) {
-                    const $ = cheerio.load(body);
-                    $('.gvProducts tr td:first-child').each(function (i, elem) {
-                        let productName = $(this).text();
-                        let price = $(this).next().text().replace('HK$ ', '');
-                        //console.log(productName)
-                        addProduct("jumbo", "motherboard", productName, price);
-                    });
-                    finish(null, true);
-                });
-            }
-            catch {
-
-            }
-        },
-        function (finish) {
-            // Jumbo computer DDR3
-            try {
-                request('http://www.jumbo-computer.com/pricelist.aspx?id=137', function (error, response, body) {
-                    const $ = cheerio.load(body);
-                    $('.gvProducts tr td:first-child').each(function (i, elem) {
-                        let productName = $(this).text();
-                        let price = $(this).next().text().replace('HK$ ', '');
-                        //console.log(productName)
-                        addProduct("jumbo", "memory", productName, price);
-                    });
-                    finish(null, true);
-                });
-            }
-            catch {
-
-            }
-        },
         function (finish) {
             // Jumbo computer DDR4
             try {
@@ -192,7 +157,24 @@ try {
                 finish(null, true);
             });
         },
+        function (finish) {
+            // Jumbo computer DDR3
+            try {
+                request('http://www.jumbo-computer.com/pricelist.aspx?id=137', function (error, response, body) {
+                    const $ = cheerio.load(body);
+                    $('.gvProducts tr td:first-child').each(function (i, elem) {
+                        let productName = $(this).text();
+                        let price = $(this).next().text().replace('HK$ ', '');
+                        //console.log(productName)
+                        addProduct("jumbo", "memory", productName, price);
+                    });
+                    finish(null, true);
+                });
+            }
+            catch {
 
+            }
+        },
         function (finish) {
             request('http://www.secomputer.com.hk/pricelist.php?ProductTypeID=3', function (error, response, body) {
                 const $ = cheerio.load(body);
@@ -238,6 +220,24 @@ try {
                 finish(null, true);
             });
         },
+        function (finish) {
+            // Jumbo computer MB
+            try {
+                request('http://www.jumbo-computer.com/pricelist.aspx?id=1', function (error, response, body) {
+                    const $ = cheerio.load(body);
+                    $('.gvProducts tr td:first-child').each(function (i, elem) {
+                        let productName = $(this).text();
+                        let price = $(this).next().text().replace('HK$ ', '');
+                        //console.log(productName)
+                        addProduct("jumbo", "motherboard", productName, price);
+                    });
+                    finish(null, true);
+                });
+            }
+            catch {
+
+            }
+        }
     ], function (errs, results) {
         // if (errs) throw errs;
         if (!errs) {
