@@ -44,7 +44,7 @@ try {
             // Jumbo computer CPU
             try {
                 request('http://www.jumbo-computer.com/pricelist.aspx?id=3', function (error, response, body) {
-                    if (!err) {
+                    if (!error) {
                         const $ = cheerio.load(body);
                         $('.gvProducts tr td:first-child').each(function (i, elem) {
                             let productName = $(this).text();
@@ -100,7 +100,7 @@ try {
             // Jumbo computer DDR4
             try {
                 request('http://www.jumbo-computer.com/pricelist.aspx?id=4', function (error, response, body) {
-                    if (!err) {
+                    if (!error) {
                         const $ = cheerio.load(body);
                         $('.gvProducts tr td:first-child').each(function (i, elem) {
                             let productName = $(this).text();
@@ -165,7 +165,7 @@ try {
             // Jumbo computer DDR3
             try {
                 request('http://www.jumbo-computer.com/pricelist.aspx?id=137', function (error, response, body) {
-                    if (!err) {
+                    if (!error) {
                         const $ = cheerio.load(body);
                         $('.gvProducts tr td:first-child').each(function (i, elem) {
                             let productName = $(this).text();
@@ -230,7 +230,7 @@ try {
             // Jumbo computer MB
             try {
                 request('http://www.jumbo-computer.com/pricelist.aspx?id=1', function (error, response, body) {
-                    if (!err) {
+                    if (!error) {
                         const $ = cheerio.load(body);
                         $('.gvProducts tr td:first-child').each(function (i, elem) {
                             let productName = $(this).text();
