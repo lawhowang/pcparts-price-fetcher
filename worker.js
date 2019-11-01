@@ -38,221 +38,224 @@ function addProduct(company, code, name, price) {
         price
     });
 }
+try {
+    async.series([
+        function (finish) {
+            // TerminalHK All
+            request('http://www.terminalhk.com/api/public/product', function (error, response, body) {
+                try {
+                    let json = JSON.parse(body);
+                    let products = json.products;
+                    for (let product of products) {
+                        var code = getCodeByCatName(product.category);
+                        if (code == 'hidden') continue;
+                        addProduct("terminalhk", code, product.name, product.price);
+                    }
+                } catch {
 
-async.series([
-    function (finish) {
-        // TerminalHK All
-        request('http://www.terminalhk.com/api/public/product', function (error, response, body) {
+                }
+                finish(null, true);
+            });
+        },
+
+        function (finish) {
+            // Faroll ALL
+            request('https://www.faroll.com/api/products/all', function (error, response, body) {
+                try {
+                    let json = JSON.parse(body);
+                    let products = json.products;
+                    for (let product of products) {
+                        var code = getCodeByCatName(product.category_id);
+                        addProduct("faroll", code, product.product_name, product.options[0].price - product.options[0].discount);
+                    }
+                } catch{
+
+                }
+                finish(null, true);
+            });
+        },
+
+        function (finish) {
+            // Jumbo computer CPU
             try {
-                let json = JSON.parse(body);
-                let products = json.products;
-                for (let product of products) {
-                    var code = getCodeByCatName(product.category);
-                    if (code == 'hidden') continue;
-                    addProduct("terminalhk", code, product.name, product.price);
-                }
-            } catch {
+                request('http://www.jumbo-computer.com/pricelist.aspx?id=3', function (error, response, body) {
+                    const $ = cheerio.load(body);
+                    $('.gvProducts tr td:first-child').each(function (i, elem) {
+                        let productName = $(this).text();
+                        let price = $(this).next().text().replace('HK$ ', '');
+                        //console.log(productName)
+                        addProduct("jumbo", "cpu", productName, price);
+                    });
+                    finish(null, true);
+                });
+            }
+            catch {
 
             }
-            finish(null, true);
-        });
-    },
-
-    function (finish) {
-        // Faroll ALL
-        request('https://www.faroll.com/api/products/all', function (error, response, body) {
+        },
+        function (finish) {
+            // Jumbo computer MB
             try {
-                let json = JSON.parse(body);
-                let products = json.products;
-                for (let product of products) {
-                    var code = getCodeByCatName(product.category_id);
-                    addProduct("faroll", code, product.product_name, product.options[0].price - product.options[0].discount);
-                }
-            } catch{
+                request('http://www.jumbo-computer.com/pricelist.aspx?id=1', function (error, response, body) {
+                    const $ = cheerio.load(body);
+                    $('.gvProducts tr td:first-child').each(function (i, elem) {
+                        let productName = $(this).text();
+                        let price = $(this).next().text().replace('HK$ ', '');
+                        //console.log(productName)
+                        addProduct("jumbo", "motherboard", productName, price);
+                    });
+                    finish(null, true);
+                });
+            }
+            catch {
 
             }
-            finish(null, true);
-        });
-    },
-
-    function (finish) {
-        // Jumbo computer CPU
-        try {
-            request('http://www.jumbo-computer.com/pricelist.aspx?id=3', function (error, response, body) {
-                const $ = cheerio.load(body);
-                $('.gvProducts tr td:first-child').each(function (i, elem) {
-                    let productName = $(this).text();
-                    let price = $(this).next().text().replace('HK$ ', '');
-                    //console.log(productName)
-                    addProduct("jumbo", "cpu", productName, price);
+        },
+        function (finish) {
+            // Jumbo computer DDR3
+            try {
+                request('http://www.jumbo-computer.com/pricelist.aspx?id=137', function (error, response, body) {
+                    const $ = cheerio.load(body);
+                    $('.gvProducts tr td:first-child').each(function (i, elem) {
+                        let productName = $(this).text();
+                        let price = $(this).next().text().replace('HK$ ', '');
+                        //console.log(productName)
+                        addProduct("jumbo", "memory", productName, price);
+                    });
+                    finish(null, true);
                 });
-                finish(null, true);
-            });
-        }
-        catch {
-
-        }
-    },
-    function (finish) {
-        // Jumbo computer MB
-        try {
-            request('http://www.jumbo-computer.com/pricelist.aspx?id=1', function (error, response, body) {
-                const $ = cheerio.load(body);
-                $('.gvProducts tr td:first-child').each(function (i, elem) {
-                    let productName = $(this).text();
-                    let price = $(this).next().text().replace('HK$ ', '');
-                    //console.log(productName)
-                    addProduct("jumbo", "motherboard", productName, price);
-                });
-                finish(null, true);
-            });
-        }
-        catch {
-
-        }
-    },
-    function (finish) {
-        // Jumbo computer DDR3
-        try {
-            request('http://www.jumbo-computer.com/pricelist.aspx?id=137', function (error, response, body) {
-                const $ = cheerio.load(body);
-                $('.gvProducts tr td:first-child').each(function (i, elem) {
-                    let productName = $(this).text();
-                    let price = $(this).next().text().replace('HK$ ', '');
-                    //console.log(productName)
-                    addProduct("jumbo", "memory", productName, price);
-                });
-                finish(null, true);
-            });
-        }
-        catch {
-
-        }
-    },
-    function (finish) {
-        // Jumbo computer DDR4
-        try {
-            request('http://www.jumbo-computer.com/pricelist.aspx?id=4', function (error, response, body) {
-                const $ = cheerio.load(body);
-                $('.gvProducts tr td:first-child').each(function (i, elem) {
-                    let productName = $(this).text();
-                    let price = $(this).next().text().replace('HK$ ', '');
-                    //console.log(productName)
-                    addProduct("jumbo", "memory", productName, price);
-                });
-                finish(null, true);
-            });
-        }
-        catch {
-
-        }
-    },
-
-
-    function (finish) {
-        // Centralfield CPU
-        request('https://www.centralfield.com/price-list/price-list-cpu/', function (error, response, body) {
-            const $ = cheerio.load(body);
-            $('tbody>tr>td:first-child').each(function (i, elem) {
-                let productName = $(this).text();
-                //console.log(productName);
-                if (productName && productName.length > 0) {
-                    let price = $(this).next().text();
-                    addProduct("centralfield", "cpu", productName, price);
-                }
-            });
-            finish(null, true);
-        });
-    },
-    function (finish) {
-        // Centralfield MB
-        request('https://www.centralfield.com/price-list/price-list-mbd/', function (error, response, body) {
-            const $ = cheerio.load(body);
-            $('tbody>tr>td:first-child').each(function (i, elem) {
-                let productName = $(this).text();
-                if (productName && productName.length > 0) {
-                    let price = $(this).next().text();
-                    addProduct("centralfield", "motherboard", productName, price);
-                }
-            });
-            finish(null, true);
-        });
-    },
-    function (finish) {
-        // Centralfield MB
-        request('https://www.centralfield.com/price-list/price-list-ram/', function (error, response, body) {
-            const $ = cheerio.load(body);
-            $('tbody>tr>td:first-child').each(function (i, elem) {
-                let productName = $(this).text();
-                if (productName && productName.length > 0) {
-                    let price = $(this).next().text();
-                    addProduct("centralfield", "memory", productName, price);
-                }
-            });
-            finish(null, true);
-        });
-    },
-
-    function (finish) {
-        request('http://www.secomputer.com.hk/pricelist.php?ProductTypeID=3', function (error, response, body) {
-            const $ = cheerio.load(body);
-            let products = $('span[id^=ProductName]');
-            let prices = $('span[id^=Price]');
-            products.each(function (i, elem) {
-                let productName = $(this).text();
-                if (productName && productName.length > 0) {
-                    let price = prices.eq(i).text();
-                    addProduct("SEComputer", "cpu", productName, price);
-                }
-            });
-            finish(null, true);
-        });
-    },
-    function (finish) {
-        request('http://www.secomputer.com.hk/pricelist.php?ProductTypeID=2', function (error, response, body) {
-            const $ = cheerio.load(body);
-            let products = $('span[id^=ProductName]');
-            let prices = $('span[id^=Price]');
-            products.each(function (i, elem) {
-                let productName = $(this).text();
-                if (productName && productName.length > 0) {
-                    let price = prices.eq(i).text();
-                    addProduct("SEComputer", "motherboard", productName, price);
-                }
-            });
-            finish(null, true);
-        });
-    },
-    function (finish) {
-        request('http://www.secomputer.com.hk/pricelist.php?ProductTypeID=1', function (error, response, body) {
-            const $ = cheerio.load(body);
-            let products = $('span[id^=ProductName]');
-            let prices = $('span[id^=Price]');
-            products.each(function (i, elem) {
-                let productName = $(this).text();
-                if (productName && productName.length > 0) {
-                    let price = prices.eq(i).text();
-                    addProduct("SEComputer", "memory", productName, price);
-                }
-            });
-            finish(null, true);
-        });
-    },
-], function (errs, results) {
-    // if (errs) throw errs;
-    if (!errs) {
-        process.env.TZ = 'Hongkong';
-        moment.locale('zh-HK');
-        global.lastUpdate = moment().format('DD/MM/YYYY HH:mm:ss');
-        fs.writeFile(`${__dirname}/public/results.json`, JSON.stringify(global), function (err) {
-            if (err) {
-                return console.log(err);
             }
-            global = {};
-        });
-        parentPort.postMessage({ });
-        //parentPort.postMessage({ data: JSON.stringify(global) });
-    } else {
-        console.log(errs);
-    }
-});
+            catch {
+
+            }
+        },
+        function (finish) {
+            // Jumbo computer DDR4
+            try {
+                request('http://www.jumbo-computer.com/pricelist.aspx?id=4', function (error, response, body) {
+                    const $ = cheerio.load(body);
+                    $('.gvProducts tr td:first-child').each(function (i, elem) {
+                        let productName = $(this).text();
+                        let price = $(this).next().text().replace('HK$ ', '');
+                        //console.log(productName)
+                        addProduct("jumbo", "memory", productName, price);
+                    });
+                    finish(null, true);
+                });
+            }
+            catch {
+
+            }
+        },
+
+
+        function (finish) {
+            // Centralfield CPU
+            request('https://www.centralfield.com/price-list/price-list-cpu/', function (error, response, body) {
+                const $ = cheerio.load(body);
+                $('tbody>tr>td:first-child').each(function (i, elem) {
+                    let productName = $(this).text();
+                    //console.log(productName);
+                    if (productName && productName.length > 0) {
+                        let price = $(this).next().text();
+                        addProduct("centralfield", "cpu", productName, price);
+                    }
+                });
+                finish(null, true);
+            });
+        },
+        function (finish) {
+            // Centralfield MB
+            request('https://www.centralfield.com/price-list/price-list-mbd/', function (error, response, body) {
+                const $ = cheerio.load(body);
+                $('tbody>tr>td:first-child').each(function (i, elem) {
+                    let productName = $(this).text();
+                    if (productName && productName.length > 0) {
+                        let price = $(this).next().text();
+                        addProduct("centralfield", "motherboard", productName, price);
+                    }
+                });
+                finish(null, true);
+            });
+        },
+        function (finish) {
+            // Centralfield MB
+            request('https://www.centralfield.com/price-list/price-list-ram/', function (error, response, body) {
+                const $ = cheerio.load(body);
+                $('tbody>tr>td:first-child').each(function (i, elem) {
+                    let productName = $(this).text();
+                    if (productName && productName.length > 0) {
+                        let price = $(this).next().text();
+                        addProduct("centralfield", "memory", productName, price);
+                    }
+                });
+                finish(null, true);
+            });
+        },
+
+        function (finish) {
+            request('http://www.secomputer.com.hk/pricelist.php?ProductTypeID=3', function (error, response, body) {
+                const $ = cheerio.load(body);
+                let products = $('span[id^=ProductName]');
+                let prices = $('span[id^=Price]');
+                products.each(function (i, elem) {
+                    let productName = $(this).text();
+                    if (productName && productName.length > 0) {
+                        let price = prices.eq(i).text();
+                        addProduct("SEComputer", "cpu", productName, price);
+                    }
+                });
+                finish(null, true);
+            });
+        },
+        function (finish) {
+            request('http://www.secomputer.com.hk/pricelist.php?ProductTypeID=2', function (error, response, body) {
+                const $ = cheerio.load(body);
+                let products = $('span[id^=ProductName]');
+                let prices = $('span[id^=Price]');
+                products.each(function (i, elem) {
+                    let productName = $(this).text();
+                    if (productName && productName.length > 0) {
+                        let price = prices.eq(i).text();
+                        addProduct("SEComputer", "motherboard", productName, price);
+                    }
+                });
+                finish(null, true);
+            });
+        },
+        function (finish) {
+            request('http://www.secomputer.com.hk/pricelist.php?ProductTypeID=1', function (error, response, body) {
+                const $ = cheerio.load(body);
+                let products = $('span[id^=ProductName]');
+                let prices = $('span[id^=Price]');
+                products.each(function (i, elem) {
+                    let productName = $(this).text();
+                    if (productName && productName.length > 0) {
+                        let price = prices.eq(i).text();
+                        addProduct("SEComputer", "memory", productName, price);
+                    }
+                });
+                finish(null, true);
+            });
+        },
+    ], function (errs, results) {
+        // if (errs) throw errs;
+        if (!errs) {
+            process.env.TZ = 'Hongkong';
+            moment.locale('zh-HK');
+            global.lastUpdate = moment().format('DD/MM/YYYY HH:mm:ss');
+            fs.writeFile(`${__dirname}/public/results.json`, JSON.stringify(global), function (err) {
+                if (err) {
+                    return console.log(err);
+                }
+                global = {};
+            });
+            parentPort.postMessage({ });
+            //parentPort.postMessage({ data: JSON.stringify(global) });
+        } else {
+            console.log(errs);
+        }
+    });
+} catch (ex) {
+    console.log(ex)
+}
