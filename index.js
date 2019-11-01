@@ -26,7 +26,7 @@ function refresh() {
         data = result.data;
         inProgress = false;
     })
-    setTimeout(refresh, 60000);
+    setTimeout(refresh, 60000 * 10); // 10 mins
 }
 
 // setInterval(refresh, 1000); // 5 mins
