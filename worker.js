@@ -239,16 +239,20 @@ async.series([
         });
     },
 ], function (errs, results) {
-    if (errs) throw errs;
-    process.env.TZ = 'Hongkong';
-    moment.locale('zh-HK');
-    global.lastUpdate = moment().format('DD/MM/YYYY HH:mm:ss');
-    fs.writeFile(`${__dirname}/public/results.json`, JSON.stringify(global), function (err) {
-        if (err) {
-            return console.log(err);
-        }
-        global = {};
-    });
-    parentPort.postMessage({ });
-    //parentPort.postMessage({ data: JSON.stringify(global) });
+    // if (errs) throw errs;
+    if (!errs) {
+        process.env.TZ = 'Hongkong';
+        moment.locale('zh-HK');
+        global.lastUpdate = moment().format('DD/MM/YYYY HH:mm:ss');
+        fs.writeFile(`${__dirname}/public/results.json`, JSON.stringify(global), function (err) {
+            if (err) {
+                return console.log(err);
+            }
+            global = {};
+        });
+        parentPort.postMessage({ });
+        //parentPort.postMessage({ data: JSON.stringify(global) });
+    } else {
+        console.log(errs);
+    }
 });
