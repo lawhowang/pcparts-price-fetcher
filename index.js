@@ -26,9 +26,11 @@ function refresh() {
         data = result.data;
         inProgress = false;
     })
+    setTimeout(refresh, 60000);
 }
 
-setInterval(refresh, 1000); // 5 mins
+// setInterval(refresh, 1000); // 5 mins
+setTimeout(refresh, 1000);
 
 app.use(express.static('public'));
 app.listen(process.env.PORT || 80)
